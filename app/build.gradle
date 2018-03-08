@@ -1,0 +1,77 @@
+apply plugin: 'com.android.application'
+
+//if (file('signing.gradle').exists()) {
+//    apply from: 'signing.gradle'
+//}else{
+//    throw new TaskExecutionException(null, new Exception("Unable to find signing.gradle, please replace Android buildTypes > signing configs with your own configuration."))
+//}
+
+String apiKeyLocation = "./src/main/assets/api_key.txt"
+//String caCertLocation = "./src/main/res/raw/ca.crt"
+
+task checkForRequiredFiles << {
+    if (!file(apiKeyLocation).exists()) {
+        throw new FileNotFoundException("The API Key file does not exist. Please make sure " + apiKeyLocation + " has been created and populated with the proper values from the Security Profile you created.")
+    }
+
+//    if (!file(caCertLocation).exists()) {
+//        throw new FileNotFoundException("The Certificate Authority public certificate file does not exist. Please make sure " + caCertLocation + " exists and contains the public certificate created during setup.")
+//    }
+}
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion '26.0.2'
+
+    defaultConfig {
+        applicationId "com.willblaschko.android.alexavoicelibrary"
+        minSdkVersion 21
+
+        targetSdkVersion 24
+        versionCode 5
+        versionName "1.5.0"
+        multiDexEnabled true;
+    }
+
+
+    buildTypes {
+        debug {
+            versionNameSuffix " Debug"
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.releaseConfig
+        }
+        release {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.releaseConfig
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+}
+
+dependencies {
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.android.support:multidex:1.0.1'
+
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile project(path: ':libs:AlexaAndroid')
+    compile project(path: ':libs:RecorderLevelView')
+    compile project(path: ':libs:speechutils-master')
+    compile 'com.vise.xiaoyaoyou:baseble:2.0.5'
+    compile 'com.kaopiz:kprogresshud:1.0.2'
+}
+
